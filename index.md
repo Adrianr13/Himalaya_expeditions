@@ -42,9 +42,38 @@ FROM peaks
 
 ![image](https://user-images.githubusercontent.com/67914619/140496244-5c834583-664e-4a61-ba72-22e20255cfa8.png)
 
+Peaks range from 5407m to 8850m in height, with an average of 6656m. What percentage of these peaks have been climbed?
 
-Peaks range from 5407m to 8850m in height, with an average of 6656m. Out of all peaks, what percentage have been climbed?
+```markdown
+SELECT 
+	climbing_status, 
+	COUNT(*) * 100 / SUM(count(*)) over() 'Percentage'
+FROM peaks
+GROUP BY climbing_status
+```
 
+![image](https://user-images.githubusercontent.com/67914619/140526874-df4ffb5a-3bc0-4fea-8196-9d013695ab89.png)
+
+72% of peaks in the database have been climbed. It's likely that some of these peaks are more difficult to climb than others. One way to assess this is to calculate how long it takes to climb each peak, on average. To do this, we need to create a new variable: days to reach highpoint. This can be computed by taking the difference between the start date of the expedition (basecamp_date) and the date when the expedition reaches the summit (highpoint_date).
+
+```markdown
+-- Create new variable: Days to reach highpoint.
+
+BEGIN TRANSACTION
+ALTER TABLE expeditions 
+ADD days_to_highpoint nvarchar(50) NULL;
+GO;
+
+UPDATE expeditions 
+SET days_to_highpoint = 
+	(DATEDIFF(day, basecamp_date, highpoint_date));
+COMMIT TRANSACTION;
+GO;
+
+ALTER TABLE expeditions
+ALTER COLUMN days_to_highpoint int NULL;
+GO;
+```
 
 ### Markdown
 
