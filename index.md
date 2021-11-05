@@ -170,7 +170,60 @@ GO
 
 The most common nationalities are Nepalese (16135), Americans (6448), Japanese (6432), British (5218) and French (4611). What about the sex of expedition members?
 
+```
+SELECT sex, COUNT(*) AS 'count_sex'
+FROM members
+GROUP BY sex
+```
 
+There are almost 10 times as many men (69472) as there are women (7044). We can also check the number of expeditions per year.
+
+```
+SELECT 
+	DISTINCT year,
+	COUNT(*) OVER(PARTITION BY year) AS 'expeditions count'
+FROM expeditions
+ORDER BY 'expeditions count' desc;
+GO
+```
+
+The years with the most expeditions are more recent years: in 2009, 2011 and 2012, there were 420, 418 and 413 expeditions. We'll later check the number of expeditions per country.
+
+Lastly, we can check the first time each peak was successfully climbed.
+
+```
+SELECT 
+	DISTINCT(peak_name), 
+	min(year) OVER(PARTITION BY peak_name) AS first_year_ascent
+FROM expeditions
+WHERE termination_reason = 'Success (main peak)'
+ORDER BY first_year_ascent
+GO
+```
+
+We can see that in every decade since the 1930s, there has been a new peak that has been climbed successfully for the first time. We can also see that Mt. Everest was climbed for the first time in 1953. Which expedition party climbed this peak for the first time?
+
+```
+SELECT 
+	p.peak_name, 
+	first_ascent_country, 
+	first_ascent_expedition_id, 
+	first_ascent_year,
+	m.sex,
+	m.age,
+	m.citizenship,
+	m.member_id,
+	m.expedition_role
+FROM peaks as p
+INNER JOIN members as m on p.first_ascent_expedition_id = m.expedition_id
+WHERE p.peak_name = 'Everest'
+```
+
+The resulting table shows the expedition members: all of them were men and of different nationalities (British, New Zealanders, Nepalese and one Indian national). This expedition was the Ninth British expedition to Everest, with Tenzing Norgay and Edmund Hillary reaching the summit on May 29th, 1953.
+
+## 3. Views
+
+This section provides the code used to create the views which are correspondingly used to visualize the data in Power BI. 
 
 ### Markdown
 
