@@ -75,6 +75,80 @@ ALTER COLUMN days_to_highpoint int NULL;
 GO;
 ```
 
+We can also calculate how long it takes for each expedition to complete. This is simply the difference between the `termination_date` and the `basecamp_date` variables.
+
+```markdown
+-- Create new variable: Days to complete expedition.
+
+BEGIN TRANSACTION;
+ALTER TABLE expeditions 
+ADD expedition_days nvarchar(50) NULL;
+GO
+UPDATE expeditions 
+SET expedition_days = 
+	(DATEDIFF(day, basecamp_date, termination_date));
+COMMIT TRANSACTION;
+
+ALTER TABLE expeditions
+ALTER COLUMN expedition_days int NULL;
+GO;
+```
+
+Now that we have created these two variables (days_to_highpoint and expedition_days), we can check which peaks took the most days to reach the highpoint and which took the longest to complete, on average. Let's only consider peaks that have been successfully climbed at least 10 times.
+
+```markdown
+SELECT 
+	e.peak_name, 
+	p.height_metres,
+	count(expedition_id) AS num_of_exp,
+	AVG(expedition_days) AS avg_completion_days,
+	AVG(days_to_highpoint) AS avg_days_to_highpoint
+FROM expeditions AS e
+INNER JOIN peaks as p ON e.peak_id = p.peak_id
+WHERE termination_reason = 'Success (main peak)' 
+GROUP BY e.peak_name, p.height_metres
+HAVING count(expedition_id) > 10
+ORDER BY avg_completion_days desc;
+GO
+```
+
+![image](https://user-images.githubusercontent.com/67914619/140531267-8bdbb693-7feb-47b9-ade8-c468a889accc.png)
+
+
+Unsurprisingly, expeditions to Mount Everest, the tallest mountain on Earth, take longest to complete, with an average of 42 days. Expeditions there take on average 37 days to reach the summit.
+
+Another way to assess the climbing difficulty for each peak is to count the number of deaths. The more deaths there are, the more difficult an expedition probably is.
+
+```markdowns
+SELECT top(10) peak_name, count(died) AS total_deaths
+FROM members
+WHERE died = 1
+GROUP BY peak_name, died
+ORDER BY total_deaths desc;
+GO
+```
+
+![image](https://user-images.githubusercontent.com/67914619/140531463-67f504c0-a892-44cc-90e5-951104e443c0.png)
+
+Again, Mt. Everest is the deadliest peak, with 306 recorded deaths in the database. We have to keep in mind though, that many expeditions have taken place there, so it is not surprising that many have died there as well.
+
+What were the most common causes of these deaths?
+
+```markdowns
+SELECT 
+	distinct(death_cause) AS death_cause_type,
+	COUNT(*) OVER(PARTITION BY death_cause) AS num_deaths
+FROM members
+ORDER BY num_deaths desc;
+```
+
+![image](https://user-images.githubusercontent.com/67914619/140531606-0651b56f-4a44-4785-b812-aacf04b451e9.png)
+
+Most deaths were a result from avalanches (369 deaths) followed by falls (331 deaths) (NAs are missing values). We can also check the nationalities of the expedition members who lost their lives.
+
+
+
+
 ### Markdown
 
 Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
