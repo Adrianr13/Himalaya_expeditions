@@ -146,6 +146,29 @@ ORDER BY num_deaths desc;
 
 Most deaths were a result from avalanches (369 deaths) followed by falls (331 deaths) (NAs are missing values). We can also check the nationalities of the expedition members who lost their lives.
 
+```
+SELECT citizenship, COUNT(*) AS num_deaths
+FROM members
+WHERE died = 1
+GROUP BY citizenship
+ORDER BY num_deaths DESC;
+```
+
+![image](https://user-images.githubusercontent.com/67914619/140533376-4a3ebe33-000f-4890-b3fd-a894c6ae1eda.png)
+
+Most of these expedition members were of Nepalese nationality (315), followed by Japanese nationals (123), South Koreans (58), French (57) and Americans (46). The ranking of the amount of dead expedition members by nationality probably reflects the total amount of expedition members; that is, we can expect there to be many Nepalese, Japanese, South Korean and French expeditioners. Let's check this.
+
+```
+SELECT citizenship, COUNT(*) AS count_nationality
+FROM members
+GROUP BY citizenship
+ORDER BY count_nationality desc;
+GO
+```
+
+![image](https://user-images.githubusercontent.com/67914619/140534166-e34f0f40-37ca-44a1-84f9-4a76b004733d.png)
+
+The most common nationalities are Nepalese (16135), Americans (6448), Japanese (6432), British (5218) and French (4611). What about the sex of expedition members?
 
 
 
@@ -172,11 +195,6 @@ Syntax highlighted code block
 ```
 
 For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/Adrianr13/Himalaya_expeditions/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
 
 
 <iframe width="1140" height="541.25" src="https://app.powerbi.com/reportEmbed?reportId=48ab6dec-1ec9-4f05-be21-384bfcf86ab9&autoAuth=true&ctid=6b0b7df3-2a59-4305-9076-be80608111d9&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXBhYXMtMS1zY3VzLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyJ9" frameborder="0" allowFullScreen="true"></iframe>
