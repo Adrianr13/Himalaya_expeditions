@@ -225,29 +225,57 @@ The resulting table shows the expedition members: all of them were men and of di
 
 This section provides the code used to create the views which are correspondingly used to visualize the data in Power BI. 
 
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
 ```
+-- Nationality table
+CREATE VIEW nationality_table AS
+SELECT citizenship, COUNT(*) AS count_nationality
+FROM members
+GROUP BY citizenship;
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+-- Top ten deadliest peaks table
+CREATE VIEW deadliest_peaks AS
+SELECT peak_name, count(died) AS total_deaths
+FROM members
+WHERE died = 1
+GROUP BY peak_name, died;
 
+-- Longest expeditions table
+CREATE VIEW longest_expeditions AS
+SELECT peak_name, count(expedition_id) AS num_of_exp,
+	avg(expedition_days) as avg_completion_days
+FROM expeditions
+WHERE termination_reason = 'Success (main peak)' 
+GROUP BY peak_name
+HAVING count(expedition_id) > 10;
+
+-- Number of expeditions per year table
+CREATE VIEW expeditions_per_year AS
+SELECT 
+	DISTINCT year,
+	COUNT(*) OVER(PARTITION BY year) AS 'expeditions count'
+FROM expeditions;
+
+-- Most common cause of death table
+CREATE VIEW death_causes_table AS
+SELECT 
+	distinct(death_cause) AS death_cause_type,
+	COUNT(*) OVER(PARTITION BY death_cause) AS num_deaths
+FROM members;
+
+-- Expeditions by country per year
+CREATE VIEW exp_countries_per_year AS
+SELECT 
+	e.year,
+	m.expedition_id,
+	ROW_NUMBER() OVER(
+		PARTITION BY e.expedition_id 
+		ORDER BY e.year DESC) AS count,
+	m.citizenship AS country
+FROM expeditions AS e
+INNER JOIN members AS m ON m.expedition_id = e.expedition_id
+WHERE 
+	expedition_role = 'Leader' OR 
+	expedition_role = 'Co-Leader';
+```
 
 <iframe width="1140" height="541.25" src="https://app.powerbi.com/reportEmbed?reportId=48ab6dec-1ec9-4f05-be21-384bfcf86ab9&autoAuth=true&ctid=6b0b7df3-2a59-4305-9076-be80608111d9&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXBhYXMtMS1zY3VzLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyJ9" frameborder="0" allowFullScreen="true"></iframe>
