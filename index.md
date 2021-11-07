@@ -176,6 +176,9 @@ FROM members
 GROUP BY sex
 ```
 
+![image](https://user-images.githubusercontent.com/67914619/140641358-7a5abab9-227d-4276-bf49-496edaef274d.png)
+
+
 There are almost 10 times as many men (69472) as there are women (7044). We can also check the number of expeditions per year.
 
 ```
@@ -186,6 +189,8 @@ FROM expeditions
 ORDER BY 'expeditions count' desc;
 GO
 ```
+
+![image](https://user-images.githubusercontent.com/67914619/140641348-4c7e30d5-fca1-42cc-bb30-63fc8b02b601.png)
 
 The years with the most expeditions are more recent years: in 2009, 2011 and 2012, there were 420, 418 and 413 expeditions. We'll later check the number of expeditions per country.
 
@@ -200,6 +205,8 @@ WHERE termination_reason = 'Success (main peak)'
 ORDER BY first_year_ascent
 GO
 ```
+
+![image](https://user-images.githubusercontent.com/67914619/140641330-4b8b0117-071a-486d-a17c-41f593bc428e.png)
 
 We can see that in every decade since the 1930s, there has been a new peak that has been climbed successfully for the first time. We can also see that Mt. Everest was climbed for the first time in 1953. Which expedition party climbed this peak for the first time?
 
@@ -219,6 +226,8 @@ INNER JOIN members as m on p.first_ascent_expedition_id = m.expedition_id
 WHERE p.peak_name = 'Everest'
 ```
 
+![image](https://user-images.githubusercontent.com/67914619/140641313-a22f0213-1f00-4f62-b8df-67b7748327d9.png)
+
 The resulting table shows the expedition members: all of them were men and of different nationalities (British, New Zealanders, Nepalese and one Indian national). This expedition was the Ninth British expedition to Everest, with Tenzing Norgay and Edmund Hillary reaching the summit on May 29th, 1953.
 
 ## 3. Views
@@ -227,12 +236,14 @@ This section provides the code used to create the views which are correspondingl
 
 ```
 -- Nationality table
+
 CREATE VIEW nationality_table AS
 SELECT citizenship, COUNT(*) AS count_nationality
 FROM members
 GROUP BY citizenship;
 
 -- Top ten deadliest peaks table
+
 CREATE VIEW deadliest_peaks AS
 SELECT peak_name, count(died) AS total_deaths
 FROM members
@@ -240,6 +251,7 @@ WHERE died = 1
 GROUP BY peak_name, died;
 
 -- Longest expeditions table
+
 CREATE VIEW longest_expeditions AS
 SELECT peak_name, count(expedition_id) AS num_of_exp,
 	avg(expedition_days) as avg_completion_days
@@ -249,6 +261,7 @@ GROUP BY peak_name
 HAVING count(expedition_id) > 10;
 
 -- Number of expeditions per year table
+
 CREATE VIEW expeditions_per_year AS
 SELECT 
 	DISTINCT year,
@@ -263,6 +276,7 @@ SELECT
 FROM members;
 
 -- Expeditions by country per year
+
 CREATE VIEW exp_countries_per_year AS
 SELECT 
 	e.year,
