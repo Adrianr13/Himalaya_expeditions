@@ -14,17 +14,119 @@ In this exercise, I'll perform some exploratory data analysis, to see what sort 
 
 ## 1. Data preparation
 
+Before actually analyzing the data, we have to make sure that the data we're working with is properly cleaned and prepared.
+
 ### 1.1. Set primary keys
+
+We start off by setting the primary keys for all three tables. We have to make sure that the primary key uniquely identifies each observation; no duplicates are allowed in the primary key column.
 
 ### 1.1.1. Expeditions table
 
+```
+-- Set expedition_id column to not null.
+
+ALTER TABLE expeditions
+ALTER COLUMN expedition_id nvarchar(50) NOT NULL;
+GO;
+
+-- Search for duplicates.
+
+SELECT expedition_id, COUNT(expedition_id)
+FROM expeditions
+GROUP BY expedition_id
+HAVING COUNT(expedition_id) > 1;
+GO
+
+-- Identify duplicates.
+
+SELECT *
+FROM expeditions
+WHERE expedition_id = 'KANG10101'
+GO
+
+-- Delete duplicates.
+
+DELETE 
+FROM expeditions
+WHERE expedition_id = 'KANG10101' AND year = '1910';
+GO;
+
+-- Set primary key to expedition_id column.
+
+ALTER TABLE expeditions
+ADD CONSTRAINT PK_expedition_id PRIMARY KEY (expedition_id);
+GO;
+```
+
 ### 1.1.2. Members table
+
+```
+-- Set member_id column to not null.
+ALTER TABLE members
+ALTER COLUMN member_id nvarchar(50) NOT NULL;
+GO;
+
+-- Search for duplicates.
+
+SELECT member_id, COUNT(member_id)
+FROM members
+GROUP BY member_id
+HAVING COUNT(member_id) > 1;
+GO;
+
+--- Delete duplicates.
+
+DELETE 
+FROM members
+WHERE expedition_id = 'KANG10101' AND year = '1910'
+GO;
+
+--- Set primary key to member_id column.
+
+ALTER TABLE members
+ADD CONSTRAINT member_id PRIMARY KEY (member_id);
+GO;
+```
 
 ### 1.1.3. Peaks table
 
+```
+ALTER TABLE peaks
+ADD CONSTRAINT peak_id PRIMARY KEY (peak_id);
+```
+
 ### 1.2. Set foreign keys
 
+```
+ALTER TABLE members 
+ADD CONSTRAINT FK_expedition_id FOREIGN KEY (expedition_id)
+REFERENCES expeditions (expedition_id)
+GO;
+```
+
 ### 1.3. Set null values
+
+Some columns contain null values that SQLSERVER does not recognize as such. In this case, those values (NA's) must be explicitly idientified as null values. Addiotionally, we must make some columns nullable.
+
+```
+ALTER TABLE expeditions
+ALTER COLUMN termination_date nvarchar(50) NULL;
+GO;
+
+ALTER TABLE expeditions
+ALTER COLUMN trekking_agency nvarchar(50) NULL;
+GO;
+
+UPDATE expeditions
+SET termination_date = NULL 
+WHERE termination_date = 'NA';
+GO;
+
+UPDATE expeditions
+SET trekking_agency = NULL
+WHERE trekking_agency = 'NA';
+GO;
+```
 
 ## 2. Analysis
 
