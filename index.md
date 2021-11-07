@@ -10,7 +10,7 @@ For this analysis, I'll use three databases:
   2. **Peaks table**: contains information about the peaks in the Himalayas.
   3. **Expeditions table**: contains information about the expeditions.
 
-In this exercise, I'll perform some exploratory data analysis, to see what sort of information we can find. The main findings are visualized in Power BI [below](#4.-data-visualization-in-power-bi) (you must be signed in to view the report). Click [here](https://github.com/Adrianr13/Himalaya_expeditions/blob/db2bf6cdc5e74dd9bca46430a61285607b5b0e85/Himalaya%20expeditions.pdf) for a static version of the report.
+In this exercise, I'll perform some exploratory data analysis, to see what sort of information we can find. The main findings are visualized in Power BI [below](#4-data-visualization-in-power-bi) (you must be signed in to view the report). Click [here](https://github.com/Adrianr13/Himalaya_expeditions/blob/db2bf6cdc5e74dd9bca46430a61285607b5b0e85/Himalaya%20expeditions.pdf) for a static version of the report.
 
 ## 1. Data preparation
 
